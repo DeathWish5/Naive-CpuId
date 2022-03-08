@@ -2,10 +2,10 @@ use std::arch::asm;
 
 #[derive(Default)]
 struct CpuId {
-    eax: usize,
-    ebx: usize,
-    ecx: usize,
-    edx: usize,
+    eax: u32,
+    ebx: u32,
+    ecx: u32,
+    edx: u32,
 }
 
 impl std::fmt::Display for CpuId {
@@ -18,13 +18,14 @@ impl std::fmt::Display for CpuId {
     }
 }
 
-fn cpu_id(eax: usize, ecx: usize) -> CpuId {
+fn cpu_id(eax: u32, ecx: u32) -> CpuId {
     let mut cpuid = CpuId::default();
     unsafe {
         asm!(
             "cpuid",
+            "mov {val}, rbx",
+            val = out(reg) cpuid.ebx,
             inout("eax") eax => cpuid.eax,
-            // out("ebx") cpuid.ebx,
             inout("ecx") ecx => cpuid.ecx,
             out("edx") cpuid.edx,
         );
